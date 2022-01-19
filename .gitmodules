@@ -1,0 +1,3 @@
+[submodule "src/vendor/node-ts-js-utils"]
+	path = src/vendor/node-ts-js-utils
+	url = https://github.com/zecarneiro/node-ts-js-utils.git
