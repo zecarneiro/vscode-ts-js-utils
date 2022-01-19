@@ -1,9 +1,9 @@
+import { IActivityBarProvider } from './../interface/Iactivity-bar-provider-bar';
 import { TreeDataProvider, TreeItem, TreeItemCollapsibleState, window } from 'vscode';
-import { IVsActivityBarProvider } from '../interface/vs-activity-bar-provider-bar';
 
 export class ActivityBarProvider implements TreeDataProvider<any> {
   constructor(
-        private outline: IVsActivityBarProvider[] | TreeItem[],
+        private outline: IActivityBarProvider[] | TreeItem[],
   ) { }
 
   getTreeItem(item: any): TreeItem | Thenable<TreeItem> {
@@ -14,7 +14,7 @@ export class ActivityBarProvider implements TreeDataProvider<any> {
     }
     return item;
   }
-  getChildren(element?: any): Thenable<IVsActivityBarProvider[] | TreeItem[]> {
+  getChildren(element?: any): Thenable<IActivityBarProvider[] | TreeItem[]> {
     if (element) {
       return element.label ? Promise.resolve(element.children) : Promise.resolve(element);
     } else {
