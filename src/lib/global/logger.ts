@@ -1,4 +1,4 @@
-import { ELoggerType, EPrintType, Logger as LoggerNode } from 'node-ts-js-utils';
+import { ELoggerType, ENotifyType, EPrintType, Logger as LoggerNode } from 'node-ts-js-utils';
 import { OutputChannel, window } from 'vscode';
 
 export class Logger extends LoggerNode {
@@ -55,5 +55,24 @@ export class Logger extends LoggerNode {
 
   clearLine() {
     this.clearScreen();
+  }
+
+  notify(data: any, type?: ENotifyType) {
+    const regex = /^\"|\"/g;
+    data = !(data instanceof Object) ?
+      data.replace(regex, '') :
+      this.functions.objectToString(data).replace(regex, '');
+    data = `${this.prefix} - ${data}`;
+    switch (type) {
+      case ENotifyType.warning:
+        window.showWarningMessage(data);
+        break;
+      case ENotifyType.error:
+        window.showErrorMessage(data);
+        break;
+      default:
+        window.showInformationMessage(data);
+        break;
+    }
   }
 }
