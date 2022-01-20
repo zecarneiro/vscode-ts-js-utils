@@ -1,8 +1,10 @@
-import { ELoggerType, ENotifyType, EPrintType, Logger as LoggerNode } from 'node-ts-js-utils';
+import { ELoggerType, ENotifyType, EPrintType, Functions, Logger as LoggerNode } from 'node-ts-js-utils';
 import { OutputChannel, window } from 'vscode';
 
 export class Logger extends LoggerNode {
-  constructor() {
+  constructor(
+    private projectName: string,
+  ) {
     super();
   }
 
@@ -16,17 +18,17 @@ export class Logger extends LoggerNode {
   /* -------------------------------------------------------------------------- */
   protected get logger(): any {
     if (!this._logger) {
-      this._logger = this.functions.getGlobalData<OutputChannel>(this.outputChannelKey, true);
+      this._logger = Functions.getGlobalDataValue<OutputChannel>(this.outputChannelKey);
         if (!this._logger) {
-          this._logger = window.createOutputChannel(global.nodeTsJsUtils.projectName);
-          this.functions.setGlobalData(this.outputChannelKey, this._logger);
+          this._logger = window.createOutputChannel(this.projectName);
+          Functions.setGlobalData(this.outputChannelKey, this._logger);
         }
     }
     return this._logger;
   }
   protected printData(type: ELoggerType, data: any, printType?: EPrintType) {
     if (data) {
-      const finalData = `${this.processPrefix(type)}${this.functions.objectToString(data)}`;
+      const finalData = `${this.processPrefix(type)}${Functions.objectToString(data)}`;
       const logger = this.getLogger<OutputChannel>();
       logger.show(true);
       if (printType === EPrintType.sameLine) {
@@ -61,7 +63,7 @@ export class Logger extends LoggerNode {
     const regex = /^\"|\"/g;
     data = !(data instanceof Object) ?
       data.replace(regex, '') :
-      this.functions.objectToString(data).replace(regex, '');
+      Functions.objectToString(data).replace(regex, '');
     data = `${this.prefix} - ${data}`;
     switch (type) {
       case ENotifyType.warning:

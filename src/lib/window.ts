@@ -1,4 +1,4 @@
-import { FileSystem } from './global/file-system';
+import { FileSystem } from './file-system';
 import {
   InputBoxOptions,
   OpenDialogOptions,
@@ -19,14 +19,14 @@ import { IRegisterCmd } from '../interface/Iregister-cmd';
 import { IActivityBarProvider } from '../interface/Iactivity-bar-provider-bar';
 import { ActivityBarProvider } from '../entities/activity-bar-provider';
 import { IStatusBar } from '../interface/Istatus-bar';
-import { ProcessorUtils } from '../processor-utils';
+import { Functions } from 'node-ts-js-utils';
 
-export class Windows extends ProcessorUtils {
+export class Windows {
   constructor(
+    private projectName: string,
     private console: Console,
-  ) {
-    super();
-  }
+    private fileSystem: FileSystem,
+  ) {}
 
   createActivityBar(data: ITreeItemWithChildren[] | ITreeItem[], id: string) {
     let activityBarData: any[] = [];
@@ -53,13 +53,13 @@ export class Windows extends ProcessorUtils {
     };
     for (const tree of data) {
       if (tree.hasChildren) {
-        const dataWithChildren = this.functions.convert<ITreeItemWithChildren>(tree);
+        const dataWithChildren = Functions.convert<ITreeItemWithChildren>(tree);
         activityBarData.push({
           label: dataWithChildren.label,
           children: treeItem(dataWithChildren.children),
         });
       } else {
-        const dataWithoutChildren = this.functions.convert<ITreeItem>(tree);
+        const dataWithoutChildren = Functions.convert<ITreeItem>(tree);
         activityBarData = activityBarData.concat(treeItem([dataWithoutChildren]));
       }
     }
@@ -67,7 +67,7 @@ export class Windows extends ProcessorUtils {
     this.console.registerCommand(vsCmd);
   }
 
-  async createInputBoxVs(inputBoxOptions: InputBoxOptions): Promise<string | undefined> {
+  async createInputBox(inputBoxOptions: InputBoxOptions): Promise<string | undefined> {
     inputBoxOptions.ignoreFocusOut = false;
     return await window.showInputBox(inputBoxOptions);
   }
@@ -75,7 +75,7 @@ export class Windows extends ProcessorUtils {
   createStatusBar(options: IStatusBar) {
     const statusbar = window.createStatusBarItem(StatusBarAlignment.Right, 0);
     statusbar.text = options.text;
-    statusbar.command = this.functions.convert<string>(options.command);
+    statusbar.command = Functions.convert<string>(options.command);
     statusbar.tooltip = options.tooltip;
     statusbar.show();
   }
@@ -87,17 +87,17 @@ export class Windows extends ProcessorUtils {
     } else {
       result = await window.showQuickPick<QuickPickItem>(items as QuickPickItem[], options);
     }
-    return this.functions.convert<T>(result);
+    return Functions.convert<T>(result);
   }
 
   async showOpenDialog<T extends Uri|Uri[]>(options: OpenDialogOptions): Promise<T|undefined> {
     const result = await window.showOpenDialog(options);
-    return !options.canSelectMany && result && result[0] ? this.functions.convert<T>(result[0]) : this.functions.convert<T>(result);
+    return !options.canSelectMany && result && result[0] ? Functions.convert<T>(result[0]) : Functions.convert<T>(result);
   }
 
   showWebViewHTML(body: string, title?: string, css?: string, language?: string) {
     const key = 'webview';
-    let webViewPanel = this.functions.getGlobalData<WebviewPanel>(key, true);
+    let webViewPanel = Functions.getGlobalDataValue<WebviewPanel>(key);
     if (!webViewPanel) {
       webViewPanel = window.createWebviewPanel(
         'WebView',
@@ -105,7 +105,7 @@ export class Windows extends ProcessorUtils {
         ViewColumn.One,
         {},
       );
-      this.functions.setGlobalData(key, webViewPanel);
+      Functions.setGlobalData(key, webViewPanel);
     }
     const data: string = `<!DOCTYPE html>
     <html lang="${language ? language : 'en'}">
@@ -129,8 +129,7 @@ export class Windows extends ProcessorUtils {
   }
 
   showTextDocument(file: string) {
-    const fileSystem = this.functions.convert<FileSystem>(this.fileSystem);
-    workspace.openTextDocument(fileSystem.getUriFile(file)).then((doc) => {
+    workspace.openTextDocument(this.fileSystem.getUriFile(file)).then((doc) => {
       window.showTextDocument(doc);
     });
   }

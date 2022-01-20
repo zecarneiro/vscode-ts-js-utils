@@ -1,4 +1,4 @@
-import { FileSystem as FileSystemNode, IFileInfo, Response } from 'node-ts-js-utils';
+import { FileSystem as FileSystemNode, Functions, IFileInfo, Response } from 'node-ts-js-utils';
 import { Uri, window, workspace, WorkspaceFolder } from 'vscode';
 
 export class FileSystem extends FileSystemNode {
@@ -24,7 +24,7 @@ export class FileSystem extends FileSystemNode {
   getWorkspaceDir(name?: string): WorkspaceFolder | WorkspaceFolder[] | undefined {
     const workspaceFolders = workspace.workspaceFolders;
     if (workspaceFolders) {
-      const folders = this.functions.copyJsonData<WorkspaceFolder[]>(workspaceFolders);
+      const folders = Functions.copyJsonData<WorkspaceFolder[]>(workspaceFolders);
       if (name) {
         return folders.find((x: { name: string; }) => x.name === name);
       }

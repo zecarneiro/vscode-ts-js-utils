@@ -1,13 +1,18 @@
+import { FileSystem } from './../file-system';
 import { Shell } from './shell';
 import { commands, Terminal, TerminalOptions, window, ExtensionContext } from 'vscode';
 import { IRegisterCmd } from '../../interface/Iregister-cmd';
 import { Console as ConsoleNode, ICommandInfo, Response } from 'node-ts-js-utils';
+import { Logger } from '../logger';
 
 export class Console extends ConsoleNode {
   constructor(
+    private projectName: string,
     private context: ExtensionContext,
+    protected logger: Logger,
+    protected fileSystem: FileSystem,
   ) {
-    super();
+    super(logger, fileSystem);
   }
 
   /* -------------------------------------------------------------------------- */
@@ -20,14 +25,14 @@ export class Console extends ConsoleNode {
   /* -------------------------------------------------------------------------- */
   get shellVs(): Shell {
     if (!this._shellVs) {
-      this._shellVs = new Shell(this);
+      this._shellVs = new Shell(this.projectName, this, this.fileSystem);
     }
     return this._shellVs;
   }
   async exec(command: ICommandInfo): Promise<Response<string>> {
     const response = await super.exec(command);
     if (command.verbose) {
-      response.print();
+      response.print(this.logger);
     }
     return response;
   }

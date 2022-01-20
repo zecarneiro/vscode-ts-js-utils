@@ -1,14 +1,15 @@
+import { FileSystem } from './../file-system';
 import { ITerminal } from '../../interface/Iterminals';
 import { window } from 'vscode';
 import { Console } from './console';
-import { ProcessorUtils } from '../../processor-utils';
 import { EShellType } from 'node-ts-js-utils';
 
-export class Shell extends ProcessorUtils {
+export class Shell {
   constructor(
+    private projectName: string,
     private console: Console,
+    private fileSystem: FileSystem,
   ) {
-    super();
     this.onCloseTerminal();
   }
 
