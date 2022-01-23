@@ -32,6 +32,8 @@ export class Console extends ConsoleNode {
   async exec(command: ICommandInfo): Promise<Response<string>> {
     const response = await super.exec(command);
     if (command.verbose) {
+      this.logger.emptyLine();
+      this.logger.prompt(this.getCommandWithArgs(command));
       response.print(this.logger);
     }
     return response;
