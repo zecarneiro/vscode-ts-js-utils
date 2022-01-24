@@ -30,6 +30,7 @@ export class Console extends ConsoleNode {
     return this._shellVs;
   }
   async exec(command: ICommandInfo): Promise<Response<string>> {
+    command = this.setDefaultCommandInfo(command);
     if (command.verbose) {
       this.logger.emptyLine();
       this.logger.prompt(this.getCommandWithArgs(command));
